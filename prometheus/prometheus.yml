@@ -1,0 +1,46 @@
+global:
+  scrape_interval: 15s # A cada quantos segundos ele busca as métricas
+  evaluation_interval: 15s # A cada quantos segundos ele avalia as regras
+
+# Configurações de alertas (opcional)
+rule_files:
+# - "first_rules.yml"
+# - "second_rules.yml"
+
+scrape_configs:
+  # Job para o n8n principal
+  - job_name: 'n8n-main'
+    static_configs:
+      - targets: ['n8n:5678'] # 'n8n' é o nome do seu serviço principal do n8n no docker-compose
+    scrape_interval: 15s
+    metrics_path: /metrics
+
+  # Job para o Redis (se você tiver um exporter do Redis)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+    scrape_interval: 10s
+    metrics_path: /metrics
+
+  # Job para o PostgreSQL (se você tiver um exporter do PostgreSQL)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+    scrape_interval: 15s
+    metrics_path: /metrics
+
+  # Job para o próprio Prometheus
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    scrape_interval: 15s
+
+  # Node Exporter (métricas do sistema)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # cAdvisor (métricas dos containers)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
